@@ -6,8 +6,8 @@ output:
   html_document:
     toc: yes
     toc_depth: 3
-    toc_float:
-      collapsed: false
+    toc_float: 
+      collapsed: true
 ---
 
 <!-- Reproducibility reports should all use this template to standardize reporting across projects. These reports will be public supplementary materials that accompany the summary report(s) of the aggregate results. -->
@@ -15,11 +15,11 @@ output:
 ## Introduction
 
 **Clarify key analysis of interest here**  
-The authors find that using an Automating version of the Maze task by generating distractor words with LSTM language models results in greater statistical power and localization of incremental processing effects when compared to Self-Paced Reading and Maze tasks with manually coded distractors.
+The authors find that using an Automated version of the Maze task (A-Maze) by generating distractor words with LSTM language models results in greater statistical power and localization of incremental processing effects when compared to Self-Paced Reading and Maze tasks with manually coded distractors.
 
 ### Justification for choice of study
 
-Boyce and colleagues provide compelling evidence for the use of A-Maze in psycholinguistic experiements involving incremental processing, such as reading text on a screen. My own research investigates incremental reading processes and the effects of stereotyped language on processing outcomes via the same measures that Boyce and colleagues investigate, which is `surprisal`, or the negative log probability of a word `w` given a preceding context  (w<sub>1</sub>...w<sub>i</sub> ). I want to replicate the results of the A-Maze experiments because I plan to employ A-Maze in my own experiments and want to acquaint myself analytic pipeline. Along the way I can assess the validity of the results in the experiments. 
+Boyce and colleagues provide compelling evidence for the use of A-Maze in psycholinguistic experiements involving incremental processing, such as reading text on a screen. My own research investigates incremental reading processes and the effects of stereotyped language on processing outcomes via the same measures that Boyce and colleagues investigate, which is `surprisal`, or the negative log probability of a word `w` given a preceding context  (w<sub>1</sub>...w<sub>i</sub> ). I want to replicate the results of the A-Maze experiments because I plan to employ A-Maze in my own experiments and want to acquaint myself with the analytic pipeline. Along the way I can assess the reliability of the results in the experiments. 
 
 ### Anticipated challenges
 
@@ -35,11 +35,13 @@ Original paper (as hosted in your repo):
 
 ### Description of the steps required to reproduce the results
 
-Please describe all the steps necessary to reproduce the key result(s) of this study. 
+Once the materials are prepared, the authors use a custom (now public) Ibex module for the maze task. Participants use the `e` and `i` keys to select among two words, and if the correct word is selected the experiment continues to the next word pair in the sentence. If the distractor word is selected the message “Incorrect! Press any key to continue” appears and the experiment continues to a new sentence where the participant can assess new word pairs. The authors also added a counter of words correct at the top of the screen; this counter only resets between experimental blocks. When the experiment finishes, the results are transmitted to the server and are recorded for download.
+
+The authors make their materials for stimuli, set-up, distractor-selection, and online experiments publicly available via this link <https://vboyce.github.io/Maze/install.html>, so in theory as long as I follow these instructions and obtain a sufficiently powered sample I should be able to replicate their results.
 
 ### Differences from original study
 
-Explicitly describe known differences in the analysis pipeline between the original paper and yours (e.g., computing environment). The goal, of course, is to minimize those differences, but differences may occur. Also, note whether such differences are anticipated to influence your ability to reproduce the original results.
+There are two major differences between my study and the orginal study. The first involves the motivation of the studies. Boyce, Futrell, and Levy replicate non-automated variants of the Maze task (and Self-Paced Reading) to compare them with A-Maze to show the superiority of A-Maze for online experiments. I instead am replicating the automated portions only as a reliability metric and familiarization exercise. Second, the original authors use Amazon Mechanical Turk as their crowdsourcing platform, whereas I am using Prolific Academic. This impacts the participant selection process since Prolific uses demographic pre-screening for participants while M-Turk does not and instead relies on demographic survey questions.
 
 ## Project Progress Check 1
 
@@ -57,7 +59,28 @@ Earlier in this report, you described the steps necessary to reproduce the key r
 
 ### Data preparation
 
-Data preparation following the analysis plan.
+#### Materials Production
+The materials production involves two steps, which the authors call "set-up stage" and "distractor-selection stage". During the set-up stage, the authors create look-up tables that map from words to frequencies and from `{length, frequency}` pairs to lists of potential distractor words (page 9). The Google Books NGrams corpus is the source of word frequencies. Distractor words are restricted to words in their dictionary that consisted entirely of lowercase letters, to avoid proper nouns; additionally, for the words that are entirely lowercase, they are able to be recapitalized to match the capitalization of the contending correct word that they are paired with.
+
+In the distractor-selection stage, each sentence in a set of materials is iterated over at the sentence and word level; for each word in each sentence, a language model generates a distractor word matched for the correct word's length and approximate frequency while also controlling for contextual probability (distractor words should be have a low probability in the given sentential context).  
+
+NB: The sentential stimuli are from Witzel et al (2012), which examine three different syntactic attachment preferences. 
+
+The following flowchart shows the materials generation process.
+
+![](//Users/jaylen/Documents/psych251/boycefutrelllevy2020/figures/Figure2BoyceFutrellLevy.png)
+	
+#### Participants 
+The study was described as for native English speaking US citizens, but the authors mentioned that anyone could complete the experiment and get paid. The authors attempt to make up for this by including a demographics section to their experiment, where they asked three yes/no questions regarding US citizenship, native English speaker status, and current country of residence. Only participants who indicated that they were native English-speaking US citizens currently residing in the US were included in the analysis (no one was excluded from the study during the experiment on the basis of their answers). As mentioned above, this is a departure from my implementation of the experiment, as Prolific Academic utilizes pre-screeners to identify eligible participants during the participant recruitment process; thus in theory, no exclusions based on these question are needed (and so neither are the questions). 
+
+#### Data Exclusions
+The authors only include data from RTs where the correct word was chosen, since a participant’s choice of an incorrect word leads to the discarding of a sentence. Words for which the recorded RT were zero were excluded as this is indicative of a software error (one word was removed in their study for the A-Maze).
+
+#### Error analysis
+Since the model has to create distractor words matched for length and frequency, there is substantial data loss at the beginning of sentences, where the most common words are articles and prepositions such as *the* and *of*. The authors report substantial data loss at word position two in their sentences: 
+![Error rate by word position in manual distractor tasks (G-Maze) versus automated distractor tasks (A-Maze). Gulordava LSTM and Jozefowicz LSTM in purple and pink, respectively.](//Users/jaylen/Documents/psych251/boycefutrelllevy2020/figures/Figure5BoyceFutrellLevy.png)
+
+
 	
 ```{r include=F}
 ### Data Preparation
@@ -73,8 +96,7 @@ Data preparation following the analysis plan.
 
 ### Key analysis
 
-The analyses as specified in the analysis plan.  
-
+Th
 *Side-by-side graph with original graph is ideal here*
 
 ###Exploratory analyses
