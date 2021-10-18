@@ -68,7 +68,7 @@ NB: The sentential stimuli are from Witzel et al (2012), which examine three dif
 
 The following flowchart shows the materials generation process.
 
-![](//Users/jaylen/Documents/psych251/boycefutrelllevy2020/figures/Figure2BoyceFutrellLevy.png)
+![](/Users/jaylen/Documents/psych251/boycefutrelllevy2020/figures/Figure2BoyceFutrellLevy.png)
 	
 #### Participants 
 The study was described as for native English speaking US citizens, but the authors mentioned that anyone could complete the experiment and get paid. The authors attempt to make up for this by including a demographics section to their experiment, where they asked three yes/no questions regarding US citizenship, native English speaker status, and current country of residence. Only participants who indicated that they were native English-speaking US citizens currently residing in the US were included in the analysis (no one was excluded from the study during the experiment on the basis of their answers). As mentioned above, this is a departure from my implementation of the experiment, as Prolific Academic utilizes pre-screeners to identify eligible participants during the participant recruitment process; thus in theory, no exclusions based on these question are needed (and so neither are the questions). 
@@ -78,7 +78,7 @@ The authors only include data from RTs where the correct word was chosen, since 
 
 #### Error analysis
 Since the model has to create distractor words matched for length and frequency, there is substantial data loss at the beginning of sentences, where the most common words are articles and prepositions such as *the* and *of*. The authors report substantial data loss at word position two in their sentences: 
-![Error rate by word position in manual distractor tasks (G-Maze) versus automated distractor tasks (A-Maze). Gulordava LSTM and Jozefowicz LSTM in purple and pink, respectively.](//Users/jaylen/Documents/psych251/boycefutrelllevy2020/figures/Figure5BoyceFutrellLevy.png)
+![Error rate by word position in manual distractor tasks (G-Maze) versus automated distractor tasks (A-Maze). Gulordava LSTM and Jozefowicz LSTM in purple and pink, respectively](/Users/jaylen/Documents/psych251/boycefutrelllevy2020/figures/Figure5BoyceFutrellLevy.png)
 
 
 	
@@ -96,7 +96,17 @@ Since the model has to create distractor words matched for length and frequency,
 
 ### Key analysis
 
-Th
+The key analysis is the difference in RT between two conditions at the critical word position and at the following (spillover) region. The authors measure word positions from `+5`  (five words after critical word at `position = 0`) to `-5` (five words before critical word at `position = 0`. The authors use the following mixed effects model:
+
+`log(RT) ~ condition + (condition | subject) + (condition | item)`
+
+
+They do not adjust for multiple corrections, and RTs are averaged for two-word critical regions (e.g. "last night") and analyze them as one word.
+
+Analysis was done in `R` using the `brms` package. Here are the main results for regions 0 - 3. I am interested in the results from the A-Maze experiements at the bottom (purple and pink lines, respectively).
+
+![](/Users/jaylen/Documents/psych251/boycefutrelllevy2020/figures/Figure4BoyceFutrellLevy.png)
+
 *Side-by-side graph with original graph is ideal here*
 
 ###Exploratory analyses
