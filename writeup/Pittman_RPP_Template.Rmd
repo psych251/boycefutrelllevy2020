@@ -103,7 +103,7 @@ The key analysis is the difference in RT between two conditions at the critical 
 
 They do not adjust for multiple corrections, and RTs are averaged for two-word critical regions (e.g. "last night") and analyze them as one word.
 
-Analysis was done in `R` using the `brms` package. Here are the main results for regions 0 - 3. I am interested in the results from the A-Maze experiements at the bottom (purple and pink lines, respectively).
+Analysis was done in `R` using the `brms` package. Here are the main results for regions 0 - 3. I am interested in the results from the A-Maze experiments at the bottom (purple and pink lines, respectively).
 
 ![](/Users/jaylen/Documents/psych251/boycefutrelllevy2020/figures/Figure4BoyceFutrellLevy.png)
 
