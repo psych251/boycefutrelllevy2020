@@ -1,0 +1,123 @@
+---
+title: "Pilot A Analysis"
+output: github_document
+---
+
+\# Analysis code
+
+```{r setup, include=F}
+
+setwd("~/Documents/psych251")
+
+library(tidyverse)
+library(stringr)
+library(brms)
+library(rstan)
+library(gtools)
+knitr::opts_chunk$set(echo = FALSE, warning=F)
+options(knitr.table.format = "html")
+library(knitr)
+library(lme4)
+library(xtable)
+```
+
+Functions:
+
+- process_data - reads in data and does exclusions
+
+- process_spr - reads in SPR data and does exclusions
+
+- for_model - relabels for word position, selects one type of sentence
+
+- brm_modelling - does actual modelling
+
+```{r more_set_up}
+
+for_model <- function(data, type){
+  #data is tibble of data (output of process_data), type is "rel", "adv", or "noun"
+
+rel_labelled <- read_rds("Maze-master/experiment/Labelled/rel_clause_labelled.rds")
+adv_labelled <- read_rds("Maze-master/experiment/Labelled/adv_clause_labelled.rds")
+noun_labelled <- read_rds("Maze-master/experiment/Labelled/noun_clause_labelled.rds")
+
+if(type=="rel"){
+data_rel <- data %>% 
+  filter(type=="relative_high"| type=="relative_low") %>% 
+  left_join(rel_labelled, by=c("word_num", "sentence", "type", "word", "group"="item_num")) %>% 
+   mutate(item.factor=as.factor(group),
+         type.numeric=ifelse(type=="relative_low", 0, 1)) #treatment code expected as 0, unusual as 1
+
+return(data_rel)}
+
+if(type=="adv"){
+data_adv<- data %>% 
+  filter(type=="adverb_high"|type=="adverb_low") %>% 
+  left_join(adv_labelled, by=c("word_num", "sentence", "type", "word", "group"="item_num")) %>% 
+  mutate(mod_word_number=ifelse(multi_word=="yes"&mod_word_number>0, mod_word_number-1, mod_word_number)) %>% 
+  group_by(subject, group, mod_word_number, type) %>% 
+  summarize(rt=mean(rt)) %>% 
+  mutate(item.factor=as.factor(group),
+         type.numeric=ifelse(type=="adverb_low", 0, 1)) #treatment code expected as 0, unusual as 1
+
+return(data_adv)}
+if(type=="noun"){
+data_noun <- data%>% 
+  filter(type=="and_no_comma"|type=="and_comma") %>% 
+  left_join(noun_labelled, by=c("word_num", "sentence", "type", "word", "group"="item_num")) %>% 
+   mutate(item.factor=as.factor(group),
+         type.numeric=ifelse(type=="and_comma", 0, 1)) #treatment code expected as 0, unusual as 1
+
+return(data_noun)
+}
+
+}
+
+brm_modelling <- function(data){
+  results <- tibble(mod_word_num=NA, mean=NA, low=NA, high=NA, above=NA, intercept=NA)
+for (i in (-5:5)){
+  data_test <- data %>% filter(mod_word_number==i)
+
+system.time(model_test <- brm(log(rt) ~ type.numeric +(type.numeric|item.factor)+(type.numeric|subject), data_test))
+fe <- fixef(model_test)
+above <- mean(extract(model_test$fit, "b_type.numeric")[[1]]>0)
+results <- add_row(results, "mod_word_num"=i, "mean"=fe[2], "low"=fe[6], "high"=fe[8], "above"=above, "intercept"=fe[1])
+}
+results_fixed <- results %>% mutate(pval_equiv = signif(2*pmin(above,1-above), digits=2)) %>% 
+  filter(!is.na(mod_word_num)) %>% 
+  mutate(mean_ms=exp(mean+intercept)-exp(intercept),
+         low_ms=exp(low+intercept)-exp(intercept),
+         high_ms=exp(high+intercept)-exp(intercept))
+
+results_fixed
+}
+
+
+```
+
+```{r set_up_pilot, include=F}
+
+g_lab <- read_rds("/Users/jaylen/Documents/psych251/g_maze-pilot.rds") %>%  filter(correct=="yes")
+
+```
+
+```{r, include=F, cache=T}
+rel_g_lab <- g_lab %>% 
+  for_model("rel")
+
+rel_g_lab_results <- brm_modelling(rel_g_lab)
+
+```
+
+```{r, include=F, cache=T}
+adv_g_lab <- g_lab %>% 
+  for_model("adv")
+
+adv_g_lab_results <- brm_modelling(adv_g_lab)
+```
+
+```{r, include=F, cache=T}
+noun_g_lab <- g_lab %>% 
+  for_model("noun")
+
+noun_g_lab_results <- brm_modelling(noun_g_lab)
+```
