@@ -1,0 +1,3 @@
+load("/Users/jaylen/Documents/psych251/Maze-master/experiment/Data/Processed/g_maze.rds")
+load("/Users/jaylen/Documents/psych251/Maze-master/experiment/Data/Processed/gulo_maze.rds")
+load("/Users/jaylen/Documents/psych251/Maze-master/experiment/Data/Processed/gulo_maze.rds")

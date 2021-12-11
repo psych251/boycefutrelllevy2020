@@ -14,7 +14,6 @@ output:
 
 ## Introduction
 
-**Clarify key analysis of interest here**  
 The authors find that using an Automated version of the Maze task (A-Maze) by generating distractor words with LSTM language models results in greater statistical power and localization of incremental processing effects when compared to Self-Paced Reading and Maze tasks with manually coded distractors.
 
 ### Justification for choice of study
@@ -43,16 +42,19 @@ The authors make their materials for stimuli, set-up, distractor-selection, and 
 
 There are two major differences between my study and the orginal study. The first involves the motivation of the studies. Boyce, Futrell, and Levy replicate non-automated variants of the Maze task (and Self-Paced Reading) to compare them with A-Maze to show the superiority of A-Maze for online experiments. I instead am replicating the automated portions only as a reliability metric and familiarization exercise. Second, the original authors use Amazon Mechanical Turk as their crowdsourcing platform, whereas I am using Prolific Academic. This impacts the participant selection process since Prolific uses demographic pre-screening for participants while M-Turk does not and instead relies on demographic survey questions.
 
+Update: Originally, I planned for a replication of studies 4 and 5. Now, given that I perform a computational reproducibility check while the details of my server infrastructure are worked out to run the true replication, there are no differences in the study design; the main differenecs at the level of implementation are regarding potential hardware differences. 
+(I ran the reproducibility check on a 2015 Macbook Pro with Retina Display (13-inch), using macOS Big Sur. The laptop has a 3.1 GHz Dual-Core Intel Core i7 Processor with a 16GB memory card and an Intel Iris Graphics 6100 1536 MB graphics card.)
+
 ## Project Progress Check 1
 
 ### Measure of success
 
-Please describe the outcome measure for the success or failure of your reproduction and how this outcome will be computed.
+The outcome measure of success is two-fold: 1) the code runs without any modifications (excepting package installs and directory changes); 2) The graph in the Key Analysis section is faithfully reproduced after the models are trained.
 
 
 ### Pipeline progress
 
-Earlier in this report, you described the steps necessary to reproduce the key result(s) of this study. Please describe your progress on each of these steps (e.g., data preprocessing, model fitting, model evaluation).
+On the computational reproducibility side, the pipeline of this set of experiments consists of loading the packages, loading the data, cleaning the data with the written functions provided by the authors of the original study, and running linear models with `brms` as discussed in the Key Analysis section.
 
 
 ## Results
@@ -76,23 +78,13 @@ The study was described as for native English speaking US citizens, but the auth
 #### Data Exclusions
 The authors only include data from RTs where the correct word was chosen, since a participant’s choice of an incorrect word leads to the discarding of a sentence. Words for which the recorded RT were zero were excluded as this is indicative of a software error (one word was removed in their study for the A-Maze).
 
+*Update from original replication plan*: all demographic exclusions are following in data processing pipeline specified by the original authors. See Participants section above.
+
 #### Error analysis
 Since the model has to create distractor words matched for length and frequency, there is substantial data loss at the beginning of sentences, where the most common words are articles and prepositions such as *the* and *of*. The authors report substantial data loss at word position two in their sentences: 
 ![Error rate by word position in manual distractor tasks (G-Maze) versus automated distractor tasks (A-Maze). Gulordava LSTM and Jozefowicz LSTM in purple and pink, respectively](/Users/jaylen/Documents/psych251/boycefutrelllevy2020/figures/Figure5BoyceFutrellLevy.png)
 
-
-	
-```{r include=F}
-### Data Preparation
-
-#### Load Relevant Libraries and Functions
-
-#### Import data
-
-#### Data exclusion / filtering
-
-#### Prepare data for analysis - create columns etc.
-```
+The data pipeline is fairly large and so is included as separate file in the class repository.
 
 ### Key analysis
 
@@ -105,20 +97,21 @@ They do not adjust for multiple corrections, and RTs are averaged for two-word c
 
 Analysis was done in `R` using the `brms` package. Here are the main results for regions 0 - 3. I am interested in the results from the A-Maze experiments at the bottom (purple and pink lines, respectively).
 
-![](/Users/jaylen/Documents/psych251/boycefutrelllevy2020/figures/Figure4BoyceFutrellLevy.png)
+```{r echo=FALSE}
+knitr::include_graphics("/Users/jaylen/Documents/psych251/boycefutrelllevy2020/figures/mainfinding_original.png")
+```
 
-*Side-by-side graph with original graph is ideal here*
 
-###Exploratory analyses
-
-Any follow-up analyses desired (not required).  
+```{r echo=FALSE}
+knitr::include_graphics("/Users/jaylen/Documents/psych251/boycefutrelllevy2020/figures/mainfinding_reproduced.png")
+```
 
 ## Discussion
 
 ### Summary of Reproduction Attempt
 
-Open the discussion section with a paragraph summarizing the primary result from the key analysis and assess whether you successfully reproduced it, partially reproduced it, or failed to reproduce it.  
+Given the criteria for successful reproduction attempts that I laid out earlier in this document, this reproduction was successful. I was able to easily run the code with no non-nominal modifications (directories/package installs). Additionally, I am able to replicate the initial results of interest (studies 4 and 5) as well as the findings for the Lab and Web versions of the Maze task on almost all counts -- the significant difference at word position 1 in the Web L-Maze of the original study (p = 0.047) as now become non-significant, which is unsurprising due to that value's proximity to the p = 0.05 critical value used in this paper and the fact that `brms` uses Monte-Carlo simulation in model selection.
 
 ### Commentary
 
-Add open-ended commentary (if any) reflecting (a) insights from follow-up exploratory analysis of the dataset, (b) assessment of the meaning of the successful or unsuccessful reproducibility attempt - e.g., for a failure to reproduce the original findings, are the differences between original and present analyses ones that definitely, plausibly, or are unlikely to have been moderators of the result, and (c) discussion of any objections or challenges raised by the current and original authors about the reproducibility attempt (if you contacted them).  None of these need to be long.
+Overall the data-sharing and data management practices implemented by the authors of this study were exemplary, and made a computational reproducibility study straightforward. In terms of replication, however, the paper's emphasis on easy implementation with Ibex Farm was unfortunately undermined by the Ibex Farm's shutdown in September 2021. Notwithstanding this hiccup, replications are currently in progress after a few initial infrastructural problems (e.g. server set-up/web-hosting on compatible servers).
